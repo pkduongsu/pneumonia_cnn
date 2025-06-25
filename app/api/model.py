@@ -41,7 +41,7 @@ class ModelPredictor:
         }
     
     def _load_model(self, model_path: str):
-        model = models.resnet18(weights=False)
+        model = models.resnet18(weights=None)
 
         num_classes = len(self.classes)
         model.fc = torch.nn.Linear(model.fc.in_features, num_classes)

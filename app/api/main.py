@@ -4,7 +4,6 @@ from api.model import ModelPredictor
 from PIL import Image
 import os
 import io
-import uuid
 from pathlib import Path
 import logging
 
@@ -27,9 +26,9 @@ app.add_middleware(
 # Load model
 try:
     predictor = ModelPredictor(model_path="models/pneumonia_detection_model.pth")
-    logger.info("✅ Model loaded successfully")
+    logger.info("Model loaded successfully")
 except Exception as e:
-    logger.error(f"❌ Model loading failed: {e}")
+    logger.error(f"Model loading failed: {e}")
     predictor = None
 
 @app.get("/")
