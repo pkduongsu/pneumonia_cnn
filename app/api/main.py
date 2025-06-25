@@ -15,6 +15,7 @@ logger = logging.getLogger("pneumonia_classifier")
 app = FastAPI(title="Pneumonia Classifier")
 
 UPLOAD_DIR = Path("uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # CORS middleware
 app.add_middleware(
@@ -23,11 +24,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Create temp directory
-TEMP_DIR = "temp_uploads"
-os.makedirs(TEMP_DIR, exist_ok=True)
-
 # Load model
 try:
     predictor = ModelPredictor(model_path="models/pneumonia_detection_model.pth")
@@ -49,27 +45,24 @@ async def predict(file: UploadFile = File(...)):
     if not file:
         return {"error": "No file uploaded"}
     
+    if predictor is None:
+        raise HTTPException(status_code=500, detail="Model not loaded")
+    
     logger.info(f"Received: {file.filename}")
     
-    # Read file content
-    content = await file.read()
-    pil_image = Image.open(io.BytesIO(content))
-
-    width, height = pil_image.size
-        
-    # Save uploaded image
-    file_extension = file.filename.split(".")[-1]
-    unique_filename = f"{uuid.uuid4()}.{file_extension}"
-    file_path = UPLOAD_DIR / unique_filename
-        
-    with open(file_path, "wb") as buffer:
-        buffer.write(content)
-    
     try:
+        # Read file content
+        content = await file.read()
+        pil_image = Image.open(io.BytesIO(content))
+        
+        # Make prediction directly without saving to disk
         result = predictor.predict(pil_image)
+        logger.info(f"Prediction result: {result}")
+        
         return result
+        
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
-        raise HTTPException(status_code=500, detail="Prediction failed")
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
     
         

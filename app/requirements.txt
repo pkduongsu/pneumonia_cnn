@@ -5,6 +5,3 @@ torch==2.0.1
 torchvision==0.15.2
 pillow==10.0.0
 requests==2.31.0
-plotly==5.17.0
-pandas==2.1.1
-python-multipart==0.0.6

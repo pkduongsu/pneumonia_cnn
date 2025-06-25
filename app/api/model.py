@@ -2,7 +2,6 @@ import torch
 import torch.nn.functional as F
 from torchvision import models, transforms
 from PIL import Image
-import io
 
 class ModelPredictor:
     def __init__(self, model_path: str):
